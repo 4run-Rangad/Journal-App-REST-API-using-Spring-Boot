@@ -1,6 +1,7 @@
 package com.arunrangad.journalApp.service;
 
 import com.arunrangad.journalApp.entity.JournalEntry;
+import com.arunrangad.journalApp.entity.User;
 import com.arunrangad.journalApp.repository.JournalEntryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -18,15 +19,24 @@ public class JournalEntryService {
     @Autowired
     private JournalEntryRepository journalEntryRepository;
 
-    public void saveEntry(JournalEntry journalEntry){
+    @Autowired
+    private UserService userService;
+
+    public void saveEntry(JournalEntry journalEntry, String userName){
         try {
+            User user = userService.findByUserName(userName);
             journalEntry.setDate(LocalDateTime.now());
-            journalEntryRepository.save(journalEntry);
+            JournalEntry saved = journalEntryRepository.save(journalEntry);
+            user.getJournalEntries().add(saved);
+            userService.saveEntry(user);
         } catch (Exception e) {
             log.error("Exception ", e);
         }
     }
 
+    public void saveEntry(JournalEntry journalEntry){
+        journalEntryRepository.save(journalEntry);
+    }
     public List<JournalEntry> getAll(){
         return journalEntryRepository.findAll();
     }
@@ -35,7 +45,10 @@ public class JournalEntryService {
         return journalEntryRepository.findById(id);
     }
 
-    public void deleteById(ObjectId id){
+    public void deleteById(ObjectId id, String userName){
+        User user = userService.findByUserName(userName);
+        user.getJournalEntries().removeIf(x -> x.getId().equals(id));
+        userService.saveEntry(user);
         journalEntryRepository.deleteById(id);
     }
 
