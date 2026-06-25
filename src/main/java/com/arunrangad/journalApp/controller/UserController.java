@@ -1,11 +1,14 @@
 package com.arunrangad.journalApp.controller;
 
 import com.arunrangad.journalApp.entity.User;
+import com.arunrangad.journalApp.repository.UserRepository;
 import com.arunrangad.journalApp.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +19,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
 
     @GetMapping
@@ -28,15 +34,15 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user){
-        try {
-            userService.saveEntry(user);
-            return new ResponseEntity<>(user, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
+//    @PostMapping
+//    public ResponseEntity<?> createUser(@RequestBody User user){
+//        try {
+//            userService.saveEntry(user);
+//            return new ResponseEntity<>(user, HttpStatus.CREATED);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//    }
 
 //    @GetMapping("id/{id}")
 //    public ResponseEntity<?> getEntryById(@PathVariable ObjectId id){
@@ -47,21 +53,21 @@ public class UserController {
 //        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 //    }
 //
-//    @DeleteMapping("id/{id}")
-//    public ResponseEntity<?> deleteEntryById(@PathVariable ObjectId id){
-//        userService.deleteById(id);
-//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//    }
+    @DeleteMapping
+    public ResponseEntity<?> deleteEntryById(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        userRepository.deleteByUserName(authentication.getName());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
-    @PutMapping("/{userName}")
-    public ResponseEntity<?> updateUser(@PathVariable String userName, @RequestBody User user){
-        User userIndb = userService.findByUserName(user.getUserName());
-        if (userIndb != null){
-            userIndb.setUserName(user.getUserName());
-            userIndb.setPassword(user.getPassword());
-            userService.saveEntry(userIndb);
-            return new ResponseEntity<>(userIndb, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @PutMapping
+    public ResponseEntity<?> updateUser(@RequestBody User user){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+        User userIndb = userService.findByUserName(userName);
+        userIndb.setUserName(user.getUserName());
+        userIndb.setPassword(user.getPassword());
+        userService.saveEntry(userIndb);
+        return new ResponseEntity<>(userIndb, HttpStatus.OK);
     }
 }
