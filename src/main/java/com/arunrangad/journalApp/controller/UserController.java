@@ -3,7 +3,6 @@ package com.arunrangad.journalApp.controller;
 import com.arunrangad.journalApp.entity.User;
 import com.arunrangad.journalApp.repository.UserRepository;
 import com.arunrangad.journalApp.service.UserService;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,7 +66,7 @@ public class UserController {
         User userIndb = userService.findByUserName(userName);
         userIndb.setUserName(user.getUserName());
         userIndb.setPassword(user.getPassword());
-        userService.saveEntry(userIndb);
+        userService.saveNewUser(userIndb);
         return new ResponseEntity<>(userIndb, HttpStatus.OK);
     }
 }
