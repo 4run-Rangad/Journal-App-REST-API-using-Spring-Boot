@@ -33,25 +33,6 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-//    @PostMapping
-//    public ResponseEntity<?> createUser(@RequestBody User user){
-//        try {
-//            userService.saveEntry(user);
-//            return new ResponseEntity<>(user, HttpStatus.CREATED);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//    }
-
-//    @GetMapping("id/{id}")
-//    public ResponseEntity<?> getEntryById(@PathVariable ObjectId id){
-//        Optional<User> user = userService.getById(id);
-//        if (user.isPresent()){
-//            return new ResponseEntity<>(user.get(), HttpStatus.OK);
-//        }
-//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//    }
-//
     @DeleteMapping
     public ResponseEntity<?> deleteEntryById(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
