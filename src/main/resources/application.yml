@@ -1,15 +1,3 @@
 spring:
-  application:
-    name: journalApp
-  data:
-    mongodb:
-      uri: your Database uri
-      database: journaldb
-      auto-index-creation: true
-  main:
-    allow-circular-references: true
-
-server:
-  port: 8080
-  servlet:
-    context-path: /journal
+  profiles:
+    active: dev
